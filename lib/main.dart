@@ -7,13 +7,35 @@ import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'dart:math';
 import 'components/transaction_form.dart';
+
 main() => runApp(ExpensesApp());
 
 class ExpensesApp extends StatelessWidget {
+  final ThemeData tema = ThemeData();
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: MyHomeApp(),
+      theme: ThemeData(
+        primaryColor: Colors.purple,
+        secondaryHeaderColor: Colors.amber,
+        useMaterial3: true,
+        fontFamily: 'Quicksand',
+        textTheme: ThemeData.light().textTheme.copyWith(
+              titleMedium: TextStyle(
+                fontFamily: 'OpenSans',
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+        appBarTheme: AppBarTheme(
+          titleTextStyle: ThemeData.light().textTheme.headline6!.copyWith(
+                fontFamily: 'OpenSans',
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+        ),
+      ),
     );
   }
 }
@@ -46,6 +68,10 @@ class _MyHomeAppState extends State<MyHomeApp> {
         newTransaction,
       );
     });
+
+    Navigator.of(
+      context,
+    ).pop();
   }
 
   _openTransctionFormModal(BuildContext context) {
@@ -64,7 +90,7 @@ class _MyHomeAppState extends State<MyHomeApp> {
         title: Text(
           'Despesas Pessoais',
         ),
-        backgroundColor: Colors.blue,
+        backgroundColor: Theme.of(context).primaryColor,
         actions: <Widget>[
           IconButton(
             icon: Icon(
@@ -96,7 +122,7 @@ class _MyHomeAppState extends State<MyHomeApp> {
         child: Icon(
           Icons.add,
         ),
-        backgroundColor: Colors.blue,
+        backgroundColor: Theme.of(context).primaryColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(
             30,
