@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:expenses/components/chart.dart';
 import 'package:expenses/components/transaction_list.dart';
 import 'package:expenses/models/transaction.dart';
 import 'package:flutter/cupertino.dart';
@@ -45,14 +46,38 @@ class MyHomeApp extends StatefulWidget {
   State<MyHomeApp> createState() => _MyHomeAppState();
 }
 
-final _transactions = [
+final List<Transaction> _transactions = [
+  Transaction(
+    id: 'T0',
+    title: 'Agua',
+    value: 400,
+    date: DateTime.now().subtract(Duration(days: 33)),
+  ),
   Transaction(
     id: 'T1',
-    title: 'Tenis de corrida',
-    value: 999.99,
-    date: DateTime.now(),
+    title: 'Camisa',
+    value: 100,
+    date: DateTime.now().subtract(Duration(days: 3)),
+  ),
+  Transaction(
+    id: 'T2',
+    title: 'Tenis',
+    value: 200,
+    date: DateTime.now().subtract(Duration(days: 4)),
   ),
 ];
+
+List<Transaction> get _recentTransactions {
+  return _transactions.where(
+    (t) {
+      return t.date.isAfter(
+        DateTime.now().subtract(
+          Duration(days: 7),
+        ),
+      );
+    },
+  ).toList();
+}
 
 class _MyHomeAppState extends State<MyHomeApp> {
   _addTransaction(String title, double value) {
@@ -103,15 +128,8 @@ class _MyHomeAppState extends State<MyHomeApp> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Container(
-            width: double.infinity,
-            child: Card(
-              color: Colors.blue,
-              child: Text(
-                'Grafico',
-              ),
-              elevation: 5,
-            ),
+          Chart(
+            _recentTransactions,
           ),
           TransactionList(
             _transactions,
