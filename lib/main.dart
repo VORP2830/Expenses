@@ -28,6 +28,10 @@ class ExpensesApp extends StatelessWidget {
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
+              labelLarge: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
             ),
         appBarTheme: AppBarTheme(
           titleTextStyle: ThemeData.light().textTheme.headline6!.copyWith(
@@ -46,26 +50,7 @@ class MyHomeApp extends StatefulWidget {
   State<MyHomeApp> createState() => _MyHomeAppState();
 }
 
-final List<Transaction> _transactions = [
-  Transaction(
-    id: 'T0',
-    title: 'Agua',
-    value: 400,
-    date: DateTime.now().subtract(Duration(days: 33)),
-  ),
-  Transaction(
-    id: 'T1',
-    title: 'Camisa',
-    value: 100,
-    date: DateTime.now().subtract(Duration(days: 3)),
-  ),
-  Transaction(
-    id: 'T2',
-    title: 'Tenis',
-    value: 200,
-    date: DateTime.now().subtract(Duration(days: 4)),
-  ),
-];
+final List<Transaction> _transactions = [ ];
 
 List<Transaction> get _recentTransactions {
   return _transactions.where(
@@ -80,12 +65,12 @@ List<Transaction> get _recentTransactions {
 }
 
 class _MyHomeAppState extends State<MyHomeApp> {
-  _addTransaction(String title, double value) {
+  _addTransaction(String title, double value, DateTime date) {
     final newTransaction = Transaction(
       id: Random().nextDouble().toString(),
       title: title,
       value: value,
-      date: DateTime.now(),
+      date: date,
     );
 
     setState(() {
@@ -97,6 +82,16 @@ class _MyHomeAppState extends State<MyHomeApp> {
     Navigator.of(
       context,
     ).pop();
+  }
+
+  _removeTransaction(String id) {
+    setState(() {
+      _transactions.removeWhere(
+        (tr) {
+          return tr.id == id;
+        },
+      );
+    });
   }
 
   _openTransctionFormModal(BuildContext context) {
@@ -131,8 +126,11 @@ class _MyHomeAppState extends State<MyHomeApp> {
           Chart(
             _recentTransactions,
           ),
-          TransactionList(
-            _transactions,
+          Expanded(
+            child: TransactionList(
+              _transactions,
+              _removeTransaction,
+            ),
           ),
         ],
       ),
