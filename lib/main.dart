@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui';
 import 'package:expenses/components/chart.dart';
 import 'package:expenses/components/transaction_list.dart';
@@ -51,6 +52,7 @@ class MyHomeApp extends StatefulWidget {
 }
 
 final List<Transaction> _transactions = [];
+bool _showChart = false;
 
 List<Transaction> get _recentTransactions {
   return _transactions.where(
@@ -105,57 +107,93 @@ class _MyHomeAppState extends State<MyHomeApp> {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    bool isLandScap = mediaQuery.orientation == Orientation.landscape;
     final appBar = AppBar(
       title: Text(
         'Despesas Pessoais',
       ),
+      centerTitle: false,
       backgroundColor: Theme.of(context).primaryColor,
       actions: <Widget>[
+        if (isLandScap)
+          IconButton(
+            icon: Icon(
+              _showChart ? Icons.list : Icons.show_chart,
+            ),
+            onPressed: () {
+              setState(() {
+                _showChart = !_showChart;
+              });
+            },
+          ),
         IconButton(
           icon: Icon(
             Icons.add,
           ),
           onPressed: () => _openTransctionFormModal(context),
-        )
+        ),
       ],
     );
+    final availableHeight = mediaQuery.size.height -
+        appBar.preferredSize.height -
+        mediaQuery.padding.top;
 
-    final availableHeight = MediaQuery.of(context).size.height - appBar.preferredSize.height - MediaQuery.of(context).padding.top;
-    
     return Scaffold(
       appBar: appBar,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Container(
-            height: availableHeight * 0.3,
-            child: Chart(
-              _recentTransactions,
+          // if (isLandScap)
+          // Row(
+          //   mainAxisAlignment: MainAxisAlignment.center,
+          //   children: [
+          //     Text(
+          //       'Exibir gráfico',
+          //     ),
+          //     Switch.adaptive(
+          //       value: _showChart,
+          //       onChanged: (newValue) {
+          //         setState(
+          //           () {
+          //             _showChart = newValue;
+          //           },
+          //         );
+          //       },
+          //     ),
+          //   ],
+          // ),
+          if (_showChart || !isLandScap)
+            Container(
+              height: availableHeight * (isLandScap ? 0.8 : 0.3),
+              child: Chart(
+                _recentTransactions,
+              ),
             ),
-          ),
-          Expanded(
-            child: Container(
-              height: availableHeight * 0.7,
+          if (!_showChart || !isLandScap)
+            Container(
+              height: availableHeight * (isLandScap ? 1 : 0.3),
               child: TransactionList(
                 _transactions,
                 _removeTransaction,
               ),
             ),
-          ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(
-          Icons.add,
-        ),
-        backgroundColor: Theme.of(context).primaryColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(
-            30,
-          ),
-        ),
-        onPressed: () => _openTransctionFormModal(context),
-      ),
+      floatingActionButton: Platform.isIOS
+          ? Container()
+          : FloatingActionButton(
+              child: Icon(
+                Icons.add,
+              ),
+              backgroundColor: Theme.of(context).primaryColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(
+                  30,
+                ),
+              ),
+              onPressed: () => _openTransctionFormModal(context),
+            ),
     );
   }
 }
