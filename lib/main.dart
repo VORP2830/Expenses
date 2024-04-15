@@ -50,7 +50,7 @@ class MyHomeApp extends StatefulWidget {
   State<MyHomeApp> createState() => _MyHomeAppState();
 }
 
-final List<Transaction> _transactions = [ ];
+final List<Transaction> _transactions = [];
 
 List<Transaction> get _recentTransactions {
   return _transactions.where(
@@ -105,31 +105,41 @@ class _MyHomeAppState extends State<MyHomeApp> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Despesas Pessoais',
-        ),
-        backgroundColor: Theme.of(context).primaryColor,
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(
-              Icons.add,
-            ),
-            onPressed: () => _openTransctionFormModal(context),
-          )
-        ],
+    final appBar = AppBar(
+      title: Text(
+        'Despesas Pessoais',
       ),
+      backgroundColor: Theme.of(context).primaryColor,
+      actions: <Widget>[
+        IconButton(
+          icon: Icon(
+            Icons.add,
+          ),
+          onPressed: () => _openTransctionFormModal(context),
+        )
+      ],
+    );
+
+    final availableHeight = MediaQuery.of(context).size.height - appBar.preferredSize.height - MediaQuery.of(context).padding.top;
+    
+    return Scaffold(
+      appBar: appBar,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Chart(
-            _recentTransactions,
+          Container(
+            height: availableHeight * 0.3,
+            child: Chart(
+              _recentTransactions,
+            ),
           ),
           Expanded(
-            child: TransactionList(
-              _transactions,
-              _removeTransaction,
+            child: Container(
+              height: availableHeight * 0.7,
+              child: TransactionList(
+                _transactions,
+                _removeTransaction,
+              ),
             ),
           ),
         ],
