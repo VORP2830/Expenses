@@ -105,95 +105,130 @@ class _MyHomeAppState extends State<MyHomeApp> {
     );
   }
 
+  Widget _getIconButton(IconData icon, Function() fn) {
+    return Platform.isIOS
+        ? GestureDetector(
+            onTap: fn,
+            child: Icon(
+              icon,
+            ),
+          )
+        : IconButton(
+            icon: Icon(
+              icon,
+            ),
+            onPressed: fn,
+          );
+  }
+
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
     bool isLandScap = mediaQuery.orientation == Orientation.landscape;
-    final appBar = AppBar(
-      title: Text(
-        'Despesas Pessoais',
-      ),
-      centerTitle: false,
-      backgroundColor: Theme.of(context).primaryColor,
-      actions: <Widget>[
-        if (isLandScap)
-          IconButton(
-            icon: Icon(
-              _showChart ? Icons.list : Icons.show_chart,
-            ),
-            onPressed: () {
-              setState(() {
-                _showChart = !_showChart;
-              });
-            },
-          ),
-        IconButton(
-          icon: Icon(
-            Icons.add,
-          ),
-          onPressed: () => _openTransctionFormModal(context),
+    final iconList = Platform.isIOS ? CupertinoIcons.square_list : Icons.list_alt_rounded;
+    final chartIcon = Platform.isIOS ? CupertinoIcons.chart_bar_fill : Icons.bar_chart_rounded;
+    final actions = <Widget>[
+      if (isLandScap)
+        _getIconButton(
+          _showChart ? iconList : chartIcon,
+          () {
+            setState(() {
+              _showChart = !_showChart;
+            });
+          },
         ),
-      ],
-    );
+      _getIconButton(
+        Platform.isIOS ? CupertinoIcons.add : Icons.add,
+        () => _openTransctionFormModal(context),
+      ),
+    ];
+    final PreferredSizeWidget appBar = Platform.isIOS
+        ? CupertinoNavigationBar(
+            middle: Text('Despesas pessoais'),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: actions,
+            ) as PreferredSizeWidget, //parse da classe
+          )
+        : AppBar(
+            title: Text(
+              'Despesas pessoais',
+              style: TextStyle(
+                fontSize: 20 * mediaQuery.textScaleFactor,
+              ),
+            ),
+            actions: actions,
+          ) as PreferredSizeWidget;
     final availableHeight = mediaQuery.size.height -
         appBar.preferredSize.height -
         mediaQuery.padding.top;
 
-    return Scaffold(
-      appBar: appBar,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          // if (isLandScap)
-          // Row(
-          //   mainAxisAlignment: MainAxisAlignment.center,
-          //   children: [
-          //     Text(
-          //       'Exibir gráfico',
-          //     ),
-          //     Switch.adaptive(
-          //       value: _showChart,
-          //       onChanged: (newValue) {
-          //         setState(
-          //           () {
-          //             _showChart = newValue;
-          //           },
-          //         );
-          //       },
-          //     ),
-          //   ],
-          // ),
-          if (_showChart || !isLandScap)
-            Container(
-              height: availableHeight * (isLandScap ? 0.8 : 0.3),
-              child: Chart(
-                _recentTransactions,
-              ),
-            ),
-          if (!_showChart || !isLandScap)
-            Container(
-              height: availableHeight * (isLandScap ? 1 : 0.3),
-              child: TransactionList(
-                _transactions,
-                _removeTransaction,
-              ),
-            ),
-        ],
-      ),
-      floatingActionButton: Platform.isIOS
-          ? Container()
-          : FloatingActionButton(
-              child: Icon(
-                Icons.add,
-              ),
-              backgroundColor: Theme.of(context).primaryColor,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(
-                  30,
+    final bodyPage = SafeArea(
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            // if (isLandScap)
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.center,
+            //   children: [
+            //     Text(
+            //       'Exibir gráfico',
+            //     ),
+            //     Switch.adaptive(
+            //       value: _showChart,
+            //       onChanged: (newValue) {
+            //         setState(
+            //           () {
+            //             _showChart = newValue;
+            //           },
+            //         );
+            //       },
+            //     ),
+            //   ],
+            // ),
+            if (_showChart || !isLandScap)
+              Container(
+                height: availableHeight * (isLandScap ? 0.8 : 0.3),
+                child: Chart(
+                  _recentTransactions,
                 ),
               ),
-              onPressed: () => _openTransctionFormModal(context),
-            ),
+            if (!_showChart || !isLandScap)
+              Container(
+                height: availableHeight * (isLandScap ? 1 : 0.3),
+                child: TransactionList(
+                  _transactions,
+                  _removeTransaction,
+                ),
+              ),
+          ],
+        ),
+      ),
     );
+
+    return Platform.isIOS
+        ? CupertinoPageScaffold(
+            navigationBar: CupertinoNavigationBar(),
+            child: bodyPage,
+          )
+        : Scaffold(
+            appBar: appBar,
+            body: bodyPage,
+            floatingActionButton: Platform.isIOS
+                ? Container()
+                : FloatingActionButton(
+                    child: Icon(
+                      Icons.add,
+                    ),
+                    backgroundColor: Theme.of(context).primaryColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(
+                        30,
+                      ),
+                    ),
+                    onPressed: () => _openTransctionFormModal(context),
+                  ),
+          );
   }
 }
