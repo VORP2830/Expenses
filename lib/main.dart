@@ -148,7 +148,7 @@ class _MyHomeAppState extends State<MyHomeApp> {
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: actions,
-            ) as PreferredSizeWidget, //parse da classe
+            )
           )
         : AppBar(
             title: Text(
@@ -209,7 +209,13 @@ class _MyHomeAppState extends State<MyHomeApp> {
 
     return Platform.isIOS
         ? CupertinoPageScaffold(
-            navigationBar: CupertinoNavigationBar(),
+            navigationBar: CupertinoNavigationBar(
+              middle: const Text('Despesas Pessoais'),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: actions,
+              ),
+            ),
             child: bodyPage,
           )
         : Scaffold(
